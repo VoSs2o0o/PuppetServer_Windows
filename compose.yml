@@ -1,0 +1,102 @@
+version: '3.7'
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:12.6}
+    hostname: postgres
+    environment:
+      # loading certs requires a non-default PGDATA, even though we don't use certs
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - PGPORT=5432
+      - POSTGRES_USER=puppetdb
+      - POSTGRES_PASSWORD=puppetdb
+      - POSTGRES_DB=puppetdb
+      # Testing specific variables needed to bootstrap cert preloading
+      - CERT_VOLUME=puppetdb-postgres
+    healthcheck:
+      # existence check for puppetdb database
+      test: [ 'CMD-SHELL', "psql --username=puppetdb puppetdb -c ''" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 90s
+    volumes:
+      - puppetdb-postgres:/var/lib/postgresql/data
+      - ${ADDITIONAL_COMPOSE_SERVICES_PATH}/postgres-custom:/docker-entrypoint-initdb.d
+    restart: always
+    expose:
+      - 5432
+      
+  puppetdb:
+    image: ${PUPPETDB_IMAGE:-puppet/puppetdb:latest}
+    hostname: puppetdb
+    environment:
+      - PUPPERWARE_ANALYTICS_ENABLED=${PUPPERWARE_ANALYTICS_ENABLED:-true}
+      - CERTNAME=puppetdb
+      # NOTE: Java follows RFC 2818 stating when SAN is provided, it's authoritative / Subject should be ignored
+      - DNS_ALT_NAMES=${PUPPETDB_DNS_ALT_NAMES:-puppetdb}
+      - USE_PUPPETSERVER=true
+      - PUPPETSERVER_HOSTNAME=puppet
+      - PUPPETSERVER_PORT=8140
+      - PUPPETDB_POSTGRES_HOSTNAME=postgres
+      - PUPPETDB_POSTGRES_PORT=5432
+      - PUPPETDB_USER=puppetdb
+      - PUPPETDB_PASSWORD=puppetdb
+    volumes:
+      - puppetdb:/opt/puppetlabs/server/data/puppetdb
+    restart: always
+    ports:
+      - 8081:8081
+      # some test suites rely on querying pdb from localhost
+      - 8080:8080
+      
+  puppet:
+    image: ${PUPPETSERVER_IMAGE:-puppet/puppetserver:latest}
+    hostname: puppet
+    environment:
+      - PUPPERWARE_ANALYTICS_ENABLED=${PUPPERWARE_ANALYTICS_ENABLED:-true}
+      # necessary to set certname and server in puppet.conf, required by
+      # puppetserver ca cli application
+      - PUPPETSERVER_HOSTNAME=puppet
+      - CA_ALLOW_SUBJECT_ALT_NAMES=true
+      # DNS_ALT_NAMES must be set before starting the stack the first time,
+      # and must list all the names under which the puppetserver can be
+      # reached. Add other names as a comma-separated list
+      # NOTE: Java follows RFC 2818 stating when SAN is provided, it's authoritative / Subject should be ignored
+      - DNS_ALT_NAMES=${PUPPET_DNS_ALT_NAMES:-puppet}
+      - PUPPET_MASTERPORT=8140
+      - PUPPETDB_SERVER_URLS=https://puppetdb:8081
+      # Testing specific variables needed to bootstrap cert preloading
+      - CERT_VOLUME=puppetserver-config
+      # NOTE: puppet oss layout is different than PE puppet
+      - CERT_SRCDIR=puppet-oss
+      - CERT_DESTDIR=ssl
+    volumes:
+      - ${ADDITIONAL_COMPOSE_SERVICES_PATH}/puppet-code:/etc/puppetlabs/code/
+      - puppetserver-config:/etc/puppetlabs/puppet/
+      - puppetserver-ca:/etc/puppetlabs/puppetserver/ca
+      - puppetserver-data:/opt/puppetlabs/server/data/puppetserver/
+    restart: always
+    ports:
+      - 8140:8140
+      - 8170:8170
+      
+  puppetboard:
+    image: bootc/puppetboard
+    ports:
+      - "8000:8000"  
+      
+volumes:
+  puppetdb-postgres:
+    # Testing specific variable needed to bootstrap cert preloading
+    # Added for documentation even though oss doesn't currently use certs
+    labels:
+      com.puppet.certs.uid: 999
+      com.puppet.certs.gid: 999
+  puppetdb:
+  puppetserver-code:
+  puppetserver-config:
+  puppetserver-ca:
+  puppetserver-data:
+
+
+
