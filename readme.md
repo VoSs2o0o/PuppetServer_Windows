@@ -27,11 +27,12 @@ variables from the images:
 there are more varibales you can set, see on:
 
 [hub.docker puppetserver](https://hub.docker.com/r/puppet/puppetserver/)
+
 CA_HOSTNAME is important here...
 
 [hub.docker puppetdb](https://hub.docker.com/r/puppet/puppetdb/)
 
-[hub.docker postgres] https://hub.docker.com/_/postgres
+[hub.docker postgres](https://hub.docker.com/_/postgres)
 
 
 compose variables:
