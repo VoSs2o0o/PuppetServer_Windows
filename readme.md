@@ -12,6 +12,7 @@ Your code Dir (/etc/puppetlabs/code) is mapped to <MyDir>\data\puppet-code\
 A complete Puppetstack, which is running in Docker on Windows.
 Puppetexplorer is also included. 
 
+## Config of this compose file
 You can set some configs in the .env-file:
 
     PUPPETSERVER_HOSTNAME (puppet)
@@ -25,7 +26,7 @@ You can set some configs in the .env-file:
     RESTART_BEHAVIOR (always) possible are: "no", always, on-failure, unless-stopped
 [see docs for restart](https://github.com/compose-spec/compose-spec/blob/master/spec.md#restart)
 
-variables from the images:
+## Config from the underaying images:
 there are more varibales you can set, see on:
 
 [hub.docker puppetserver](https://hub.docker.com/r/puppet/puppetserver/)
@@ -37,7 +38,7 @@ CA_HOSTNAME is important here...
 [hub.docker postgres](https://hub.docker.com/_/postgres)
 
 
-compose variables:
+## compose variables:
 
     COMPOSE_PROJECT_NAME (puppetmaster)
 
