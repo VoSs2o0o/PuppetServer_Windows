@@ -22,7 +22,7 @@ services:
     volumes:
       - puppetdb-postgres:/var/lib/postgresql/data
       - ${ADDITIONAL_COMPOSE_SERVICES_PATH}/postgres-custom:/docker-entrypoint-initdb.d
-    restart: always
+    restart: ${RESTART_BEHAVIOR:-always}
     expose:
       - 5432
       
@@ -43,7 +43,7 @@ services:
       - PUPPETDB_PASSWORD=puppetdb
     volumes:
       - puppetdb:/opt/puppetlabs/server/data/puppetdb
-    restart: always
+    restart: ${RESTART_BEHAVIOR:-always}
     ports:
       - 8081:8081
       # some test suites rely on querying pdb from localhost
@@ -75,13 +75,14 @@ services:
       - puppetserver-config:/etc/puppetlabs/puppet/
       - puppetserver-ca:/etc/puppetlabs/puppetserver/ca
       - puppetserver-data:/opt/puppetlabs/server/data/puppetserver/
-    restart: always
+    restart: ${RESTART_BEHAVIOR:-always}
     ports:
       - 8140:8140
       - 8170:8170
       
   puppetboard:
     image: ${PUPPETBOARD_IMAGE:-bootc/puppetboard:latest} 
+    restart: ${RESTART_BEHAVIOR:-always}
     ports:
       - "8000:8000"  
       

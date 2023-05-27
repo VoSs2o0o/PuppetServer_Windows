@@ -22,6 +22,8 @@ You can set some configs in the .env-file:
     PUPPETSERVER_IMAGE (puppet/puppetserver:latest)
     PUPPETBOARD_IMAGE (bootc/puppetboard:latest)
     PUPPERWARE_ANALYTICS_ENABLED (true)
+    RESTART_BEHAVIOR (always) possible are: "no", always, on-failure, unless-stopped
+    [see docs for restart](https://github.com/compose-spec/compose-spec/blob/master/spec.md#restart)
 
 variables from the images:
 there are more varibales you can set, see on:
