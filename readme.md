@@ -23,7 +23,18 @@ You can set some configs in the .env-file:
     PUPPETBOARD_IMAGE (bootc/puppetboard:latest)
     PUPPERWARE_ANALYTICS_ENABLED (true)
 
-compose configs
+variables from the images:
+there are more varibales you can set, see on:
+
+[hub.docker puppetserver](https://hub.docker.com/r/puppet/puppetserver/)
+CA_HOSTNAME is important here...
+
+[hub.docker puppetdb](https://hub.docker.com/r/puppet/puppetdb/)
+
+[hub.docker postgres] https://hub.docker.com/_/postgres
+
+
+compose variables:
 
     COMPOSE_PROJECT_NAME (puppetmaster)
 
