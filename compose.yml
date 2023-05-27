@@ -35,7 +35,7 @@ services:
       # NOTE: Java follows RFC 2818 stating when SAN is provided, it's authoritative / Subject should be ignored
       - DNS_ALT_NAMES=${PUPPETDB_DNS_ALT_NAMES:-puppetdb}
       - USE_PUPPETSERVER=true
-      - PUPPETSERVER_HOSTNAME=puppet
+      - PUPPETSERVER_HOSTNAME=${PUPPETSERVER_HOSTNAME:-puppet}
       - PUPPETSERVER_PORT=8140
       - PUPPETDB_POSTGRES_HOSTNAME=postgres
       - PUPPETDB_POSTGRES_PORT=5432
@@ -51,12 +51,12 @@ services:
       
   puppet:
     image: ${PUPPETSERVER_IMAGE:-puppet/puppetserver:latest}
-    hostname: puppet
+    hostname: ${PUPPETSERVER_HOSTNAME:-puppet}
     environment:
       - PUPPERWARE_ANALYTICS_ENABLED=${PUPPERWARE_ANALYTICS_ENABLED:-true}
       # necessary to set certname and server in puppet.conf, required by
       # puppetserver ca cli application
-      - PUPPETSERVER_HOSTNAME=puppet
+      - PUPPETSERVER_HOSTNAME=${PUPPETSERVER_HOSTNAME:-puppet}
       - CA_ALLOW_SUBJECT_ALT_NAMES=true
       # DNS_ALT_NAMES must be set before starting the stack the first time,
       # and must list all the names under which the puppetserver can be
@@ -81,7 +81,7 @@ services:
       - 8170:8170
       
   puppetboard:
-    image: bootc/puppetboard
+    image: ${PUPPETBOARD_IMAGE:-bootc/puppetboard:latest} 
     ports:
       - "8000:8000"  
       
